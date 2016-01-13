@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/splash">
+
+
+    <!--<TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="版本号:1.0"
+        android:textSize="30dp"
+        android:layout_centerInParent="true"
+        android:shadowColor="#ffff8800"
+        android:shadowDx="7"
+        android:shadowRadius="2"
+        />-->
+    <!--<ProgressBar
+        android:layout_below="@id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        style="@android:style/Widget.ProgressBar.Large"
+        />-->
+</RelativeLayout>
