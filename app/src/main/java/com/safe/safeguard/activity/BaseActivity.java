@@ -34,15 +34,15 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        initView();
-        initData();
+        initViewComponent();
+        initDatas();
     }
 
-    private void initData() {
+    private void initDatas() {
         mInflater = LayoutInflater.from(mContext);
     }
 
-    private void initView() {
+    private void initViewComponent() {
         rl_title = (RelativeLayout) findViewById(R.id.rl_title);
         rl_contain = (RelativeLayout) findViewById(R.id.rl_contain);
         tv_title = (TextView) findViewById(R.id.tv_title);

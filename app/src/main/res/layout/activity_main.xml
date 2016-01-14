@@ -23,12 +23,36 @@
             android:text="功能列表"/>
     </RelativeLayout>
     
-    <RelativeLayout
+    <!--<RelativeLayout
         android:id="@+id/rl_contain"
         android:layout_below="@id/rl_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
-    </RelativeLayout>
+    </RelativeLayout>-->
+    <TextView
+        android:id="@+id/tv_show"
+        android:layout_below="@id/rl_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="架飞机阿什顿就发生到后来会计法杀菌路口等法律卡时间到付款后撒大开发"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        />
+
+    <GridView
+        android:id="@+id/gv_main"
+        android:layout_below="@id/tv_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="10dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="3">
+
+    </GridView>
+
 </RelativeLayout>

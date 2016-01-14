@@ -39,6 +39,7 @@
             android:textColor="@android:color/white"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
+            android:visibility="gone"
             android:background="@android:color/transparent"/>
     </RelativeLayout>
 
