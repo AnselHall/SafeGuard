@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    xmlns:cus="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-
-        android:orientation="vertical"
+    <com.safe.safeguard.widget.SettingItem
+        android:id="@+id/si_settingitem_update"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="wrap_content"
+        cus:des_off="打开提示更新"
+        cus:des_on="关闭提示更新"
+        cus:setting_title="提示更新">
 
-    </LinearLayout>
+    </com.safe.safeguard.widget.SettingItem>
 
 </LinearLayout>

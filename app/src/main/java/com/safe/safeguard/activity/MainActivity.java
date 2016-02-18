@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -45,6 +46,7 @@ public class MainActivity extends Activity {
     private GridAdapter gridAdapter;
     private String[] names;
     private int[] imageResource;
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +56,16 @@ public class MainActivity extends Activity {
 
         initView();
         initData();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                checkVersion();
-            }
-        }).start();
-        registerComponent();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        }).start();
+        if (sp.getBoolean("isChecked", false)) {
+
+            checkVersion();
+        }
+        registerListener();
     }
 
     /**
@@ -204,6 +209,9 @@ public class MainActivity extends Activity {
 
 
     private void initData() {
+
+        sp = getSharedPreferences("update", MODE_PRIVATE);
+
         names = new String[]{"手机防盗", "通讯卫士", "软件管理", "进程管理", "流量统计", "手机杀毒", "缓存清理", "高级工具", "设置中心"};
         imageResource = new int[]{R.mipmap.safe, R.mipmap.callmsgsafe, R.mipmap.app, R.mipmap.taskmanager, R.mipmap.netmanager, R.mipmap.trojan, R.mipmap.sysoptimize, R.mipmap.atools, R.mipmap.settings};
         gridAdapter = new GridAdapter();
@@ -215,7 +223,7 @@ public class MainActivity extends Activity {
         gv_main = (GridView) findViewById(R.id.gv_main);
     }
 
-    private void registerComponent() {
+    private void registerListener() {
         gv_main.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
