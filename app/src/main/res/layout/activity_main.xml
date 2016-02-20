@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/rl_title"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="@dimen/title_size"
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
@@ -31,7 +31,7 @@
 
 
     </RelativeLayout>-->
-    <TextView
+    <com.safe.safeguard.widget.Scoll_TextView
         android:id="@+id/tv_show"
         android:layout_below="@id/rl_title"
         android:layout_width="match_parent"
@@ -42,7 +42,8 @@
         android:marqueeRepeatLimit="marquee_forever"
         android:focusableInTouchMode="true"
         android:focusable="true"
-        />
+        >
+    </com.safe.safeguard.widget.Scoll_TextView >
 
     <GridView
         android:id="@+id/gv_main"

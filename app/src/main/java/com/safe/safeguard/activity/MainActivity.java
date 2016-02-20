@@ -11,11 +11,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,7 +28,9 @@ import com.google.gson.Gson;
 import com.safe.safeguard.R;
 import com.safe.safeguard.constant.Url;
 import com.safe.safeguard.entity.VersionInfo;
+import com.safe.safeguard.utils.MD5Utils;
 import com.safe.safeguard.utils.StringUtils;
+import com.safe.safeguard.utils.ToastUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,14 +44,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = "TAG";
     private GridView gv_main;
     private GridAdapter gridAdapter;
     private String[] names;
     private int[] imageResource;
-    private SharedPreferences sp;
+    private SharedPreferences updateSp;
+    private SharedPreferences configSp;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +68,7 @@ public class MainActivity extends Activity {
 //            public void run() {
 //            }
 //        }).start();
-        if (sp.getBoolean("isChecked", false)) {
+        if (updateSp.getBoolean("isChecked", false)) {
 
             checkVersion();
         }
@@ -210,7 +217,8 @@ public class MainActivity extends Activity {
 
     private void initData() {
 
-        sp = getSharedPreferences("update", MODE_PRIVATE);
+        updateSp = getSharedPreferences("update", MODE_PRIVATE);
+        configSp = getSharedPreferences("config", MODE_PRIVATE);
 
         names = new String[]{"手机防盗", "通讯卫士", "软件管理", "进程管理", "流量统计", "手机杀毒", "缓存清理", "高级工具", "设置中心"};
         imageResource = new int[]{R.mipmap.safe, R.mipmap.callmsgsafe, R.mipmap.app, R.mipmap.taskmanager, R.mipmap.netmanager, R.mipmap.trojan, R.mipmap.sysoptimize, R.mipmap.atools, R.mipmap.settings};
@@ -227,9 +235,19 @@ public class MainActivity extends Activity {
         gv_main.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e(TAG, "onItemClick: " + position);
+//                Log.e(TAG, "onItemClick: " + position);
                 switch (position) {
                     case 0://手机防盗
+                        //判断是否设置密码
+                        String password = configSp.getString("password", "");
+                        if (!TextUtils.isEmpty(password)) {
+                            //已经设置了密码，弹出输入密码框
+                            enterPassword();
+                        } else {
+                            //还未设置密码，弹出设置密码框
+                            setPassword();
+                        }
+
                         break;
                     case 1://通讯卫士
                         break;
@@ -252,6 +270,131 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    int count = 0;
+
+    /**
+     * 输入密码
+     */
+    private void enterPassword() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);//设置对话框不能消息
+        View view = View.inflate(getApplicationContext(), R.layout.dialog_enterpassword, null);
+        final EditText ed_home_password = (EditText) view.findViewById(R.id.ed_home_password);
+        Button btn_ok = (Button) view.findViewById(R.id.btn_ok);
+        Button btn_cancel = (Button) view.findViewById(R.id.btn_cancel);
+        ImageView iv_enterpassword_imageview = (ImageView)view.findViewById(R.id.iv_enterpassword_imageview);
+        iv_enterpassword_imageview.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //隐藏和显示输入的密码
+                if (count % 2 == 0) {
+                    //显示密码
+                    ed_home_password.setInputType(1);
+                } else {
+                    //隐藏密码
+                    ed_home_password.setInputType(129);
+                }
+                count++;
+            }
+        });
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String password = ed_home_password.getText().toString().trim();
+                //判断输入的密码时候为空
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(getApplicationContext(), "请输入密码", Toast.LENGTH_SHORT).show();
+                    return;//不允许用户在执行其他操作
+                }
+                //输入密码和保存的密码比较
+                //获取保存的密码
+                String passwrod_sp = configSp.getString("password", "");
+                if (MD5Utils.encryption(password).equals(passwrod_sp)) {
+                    //提醒用户，消除对话框，跳转手机防盗界面
+//                    Toast.makeText(getApplicationContext(), "密码正确", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    //跳转手机防盗界面
+                    Intent intent = new Intent(MainActivity.this,LostFindActivity.class);
+                    startActivity(intent);
+                }else{
+                    //提醒用户密码错误
+                    Toast.makeText(getApplicationContext(), "密码错误", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog = builder.create();
+//        builder.setView(view);
+        dialog.setView(view, 0, 0, 0, 0);
+        dialog.show();
+    }
+
+    /**
+     * 设置密码
+     */
+    private void setPassword() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setCancelable(false);//设置对话框不能消息
+        View view = View.inflate(getApplicationContext(), R.layout.dialog_setpassword, null);
+        final EditText ed_home_password = (EditText) view.findViewById(R.id.ed_home_password);
+        final EditText ed_home_password_confirm = (EditText) view.findViewById(R.id.ed_home_password_confirm);
+        Button btn_ok = (Button) view.findViewById(R.id.btn_ok);
+        Button btn_cancel = (Button) view.findViewById(R.id.btn_cancel);
+
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String password = ed_home_password.getText().toString().trim();
+                //判断输入的密码时候为空
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(getApplicationContext(), "请输入密码", Toast.LENGTH_SHORT).show();
+                    return;//不允许用户在执行其他操作
+                }
+                String password_confirm = ed_home_password_confirm.getText().toString().trim();
+                if (password.equals(password_confirm)) {
+                    //保存密码
+                    SharedPreferences.Editor edit = configSp.edit();
+                    edit.putString("password", MD5Utils.encryption(password));
+                    edit.commit();
+                    dialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "密码设置成功", Toast.LENGTH_SHORT).show();
+                    //跳转手机防盗界面
+                    Intent intent = new Intent(MainActivity.this,LostFindActivity.class);
+                    startActivity(intent);
+                }else{
+                    //提醒用户
+                    Toast.makeText(getApplicationContext(), "两次密码输入不一致", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog = builder.create();
+        //viewSpacingLeft:距离左边的距离
+        //viewSpacingTop：距离上部的距离
+        //viewSpacingRight：距离右边的距离
+        //viewSpacingBottom：距离下部的距离
+//        builder.setView(view);//根据dialog.setview的效果一样
+        dialog.setView(view, 0, 0, 0, 0);
+        dialog.show();
     }
 
     class ViewHolder {
@@ -296,15 +439,15 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * 请求网络，获取最新版本信息
-     */
-    private class VersionAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-
-            return null;
-        }
-    }
+//    /**
+//     * 请求网络，获取最新版本信息
+//     */
+//    private class VersionAsyncTask extends AsyncTask<Void, Void, Void> {
+//        @Override
+//        protected Void doInBackground(Void... params) {
+//
+//
+//            return null;
+//        }
+//    }
 }

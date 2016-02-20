@@ -26,7 +26,7 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     private RelativeLayout rl_title;
     private RelativeLayout rl_contain;
     private TextView tv_title;
-    private Button btn_back;
+    protected Button btn_back;
     private Button btn_confim;
 
     @Override
